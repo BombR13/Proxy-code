@@ -1,0 +1,10 @@
+{
+  "build": {
+    "nixpacks": {
+      "packs": ["nodejs", "google-chrome"]
+    }
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
