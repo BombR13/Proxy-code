@@ -6,24 +6,40 @@ const BROWSERLESS_KEY = process.env.BROWSERLESS_KEY;
 
 app.get("/", async (req, res) => {
   const site = req.query.site;
-  if (!site) return res.send("Use ?site=https://example.com");
+  if (!site) {
+    return res.send("🕵️‍♂️ Add ?site=https://example.com");
+  }
 
   try {
-    const response = await axios.post(
+    const { data } = await axios.post(
       `https://chrome.browserless.io/content?token=${BROWSERLESS_KEY}`,
       {
         url: site,
         options: {
           waitUntil: "load",
-          timeout: 20000,
+          timeout: 30000,
+          userAgent:
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
+        },
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
         },
       }
     );
-    res.send(response.data);
+    res.send(data);
   } catch (err) {
-    res.status(500).send("Failed to render: " + err.message);
+    console.error(err.response?.data || err.message);
+    res
+      .status(500)
+      .send(
+        "❌ Failed to render. Maybe the site blocked the request or your Browserless free plan ran out."
+      );
   }
 });
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log("✅ Proxy running on port " + PORT));
+app.listen(PORT, () => {
+  console.log(`🚀 Proxy server running on port ${PORT}`);
+});
